@@ -9,7 +9,7 @@ RUN go mod download
 RUN go mod verify
 
 ARG APP_VERSION
-RUN go build -o bin/avion -ldflags "-X main.Version=$APP_VERSION" ./cmd
+RUN go build -o bin/avion_server -ldflags "-X main.Version=$APP_VERSION" ./cmd
 
 
 FROM busybox
@@ -19,4 +19,6 @@ RUN mkdir app
 COPY --from=builder /app/bin/* /app
 COPY migrations /migrations
 
-CMD ["./app/avion"]
+#copy static files if needed
+
+CMD ["./app/avion_server"]

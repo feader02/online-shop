@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/feader02/online-shop/internal/api"
+	"github.com/feader02/online-shop/internal/db"
+	_ "github.com/go-sql-driver/mysql"
 	"net/http"
 	"os"
 )
@@ -11,7 +14,7 @@ var (
 )
 
 func main() {
-	fmt.Printf("App version : %s\n", Version)
+	fmt.Printf("App version: %s\n", Version)
 
 	port, ok := os.LookupEnv("PORT")
 	if !ok {
@@ -21,8 +24,14 @@ func main() {
 		fmt.Printf("Running the server on port %s\n", port)
 	}
 
-	err := http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
+	mysql := db.NewStorage()
+	defer mysql.Close()
+
+	app := api.NewApp(mysql)
+	router := app.GetHandle()
+
+	err := http.ListenAndServe(fmt.Sprintf(":%s", port), router)
 	if err != nil {
-		fmt.Print("Server run error", err)
+		fmt.Println("Server run error", err)
 	}
 }
