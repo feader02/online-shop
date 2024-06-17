@@ -19,6 +19,4 @@ RUN mkdir app
 COPY --from=builder /app/bin/* /app
 COPY migrations /migrations
 
-#copy static files if needed
-
 CMD ["./app/avion_server"]

@@ -30,7 +30,7 @@ func NewStorage() *MySQLStorage {
 	dbUser, ok := os.LookupEnv("DB_USER")
 	if !ok {
 		fmt.Println("env var DB_USER is not found")
-		dbHost = "root"
+		dbUser = "root"
 	}
 	dbPass := os.Getenv("DB_PASSWORD")
 
