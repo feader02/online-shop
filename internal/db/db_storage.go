@@ -52,6 +52,8 @@ func NewStorage() *MySQLStorage {
 
 	s.db = DBConnect(dbConf)
 
+	fmt.Printf("DB connection string: %s\n", dbConf.FormatDSN())
+
 	return s
 }
 
@@ -66,5 +68,7 @@ func (ms *MySQLStorage) GetProducts(dest interface{}, tableName string, filter s
 		query += " WHERE " + filter
 	}
 	err := db.Select(dest, query, args...)
+	fmt.Println(err)
+	fmt.Println("db: ", db)
 	return err
 }
