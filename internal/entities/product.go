@@ -9,4 +9,5 @@ type Product struct {
 	Width       int     `db:"width" json:"width"`
 	Depth       int     `db:"depth" json:"depth"`
 	Photo       string  `db:"photo" json:"photo"`
+	Type        string  `db:"type" json:"type"`
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/feader02/online-shop/internal/api"
 	"github.com/feader02/online-shop/internal/db"
+	"github.com/feader02/online-shop/internal/utils"
 	_ "github.com/go-sql-driver/mysql"
 	"net/http"
 	"os"
@@ -14,6 +15,8 @@ var (
 )
 
 func main() {
+	jwt, err := utils.GenerateJWT("vania")
+	fmt.Println(jwt)
 	fmt.Printf("App version: %s\n", Version)
 
 	port, ok := os.LookupEnv("PORT")
@@ -30,7 +33,7 @@ func main() {
 	app := api.NewApp(mysql)
 	router := app.GetHandle()
 
-	err := http.ListenAndServe(fmt.Sprintf(":%s", port), router)
+	err = http.ListenAndServe(fmt.Sprintf(":%s", port), router)
 	if err != nil {
 		fmt.Println("Server run error", err)
 	}

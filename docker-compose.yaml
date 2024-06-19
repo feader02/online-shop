@@ -1,0 +1,47 @@
+services:
+  server:
+    networks:
+      - avion_bridge
+    container_name: avion
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_VERSION: v1.0.0
+    depends_on:
+      db:
+        condition: service_healthy
+    hostname: avion
+    env_file:
+      - path: ./.env
+        required: true
+    ports:
+      - "$PORT:$PORT"
+
+  db:
+    networks:
+      - avion_bridge
+    image: mysql:8.3
+    container_name: avion_db
+    restart: unless-stopped
+    tty: true
+    volumes:
+      - ./init:/docker-entrypoint-initdb.d
+      - db_data:/var/lib/mysql
+    ports:
+      - "$MYSQL_TCP_PORT_EXPOSE:$DB_PORT"
+    env_file:
+      - path: ./.env
+        required: true
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "$DB_HOST", "-u$DB_USER", "-p$DB_PASSWORD"]
+      interval: 20s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  db_data:
+
+networks:
+  avion_bridge:
+    external: true

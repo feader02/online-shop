@@ -20,7 +20,10 @@ func NewApp(s *db.MySQLStorage) *App {
 func (a *App) GetHandle() http.Handler {
 	router := http.NewServeMux()
 
-	router.HandleFunc("GET /api/products", a.GetProducts)
+	router.HandleFunc("GET /api/products", a.GetProductsList)
+	router.HandleFunc("GET /api/products/{id}", a.GetProduct)
+	router.HandleFunc("POST /api/registration/user", a.Registration)
+	router.HandleFunc("POST /api/sign-in/user", a.SignIn)
 
 	return router
 }

@@ -6,6 +6,7 @@ import (
 	mysqlDriver "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"os"
+	"strings"
 )
 
 type MySQLStorage struct {
@@ -52,12 +53,12 @@ func NewStorage() *MySQLStorage {
 
 	s.db = DBConnect(dbConf)
 
-	fmt.Printf("DB connection string: %s\n", dbConf.FormatDSN())
+	fmt.Println(dbConf.FormatDSN())
 
 	return s
 }
 
-func (ms *MySQLStorage) GetProducts(dest interface{}, tableName string, filter string, args ...interface{}) error {
+func (ms *MySQLStorage) Get(dest interface{}, tableName string, filter string, args ...interface{}) error {
 	db := ms.db
 	if db == nil {
 		return fmt.Errorf("DB is empty")
@@ -65,10 +66,71 @@ func (ms *MySQLStorage) GetProducts(dest interface{}, tableName string, filter s
 
 	query := "SELECT * FROM " + tableName
 	if filter != "" {
-		query += " WHERE " + filter
+		query += " " + filter
 	}
 	err := db.Select(dest, query, args...)
-	fmt.Println(err)
-	fmt.Println("db: ", db)
 	return err
+}
+
+func (ms *MySQLStorage) Add(dest map[string]interface{}, tableName string, order []string) error {
+	db := ms.db
+	queryKeys := make([]interface{}, len(order))
+	queryArgs := make([]interface{}, len(order))
+
+	login, okay := dest["login"]
+	if !okay {
+		return fmt.Errorf("login not provided")
+	}
+
+	for i, key := range order {
+		queryKeys[i] = key
+		if val, ok := dest[key]; ok {
+			queryArgs[i] = val
+		} else {
+			return fmt.Errorf("key %s not found in dest map", key)
+		}
+	}
+
+	keys := strings.Join(order, ", ")
+	placeholders := strings.Repeat("?, ", len(queryArgs)-1) + "?"
+
+	ok, err := ms.DataExists(tableName, "login = ?", login)
+	if err != nil {
+		return fmt.Errorf("error checking if user exists: %v", err)
+	}
+	if ok {
+		return fmt.Errorf("user with login %s already exists", login)
+	}
+
+	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", tableName, keys, placeholders)
+	_, err = db.Exec(query, queryArgs...)
+	return err
+}
+
+func (ms *MySQLStorage) DataExists(tableName string, whereClause string, args ...interface{}) (bool, error) {
+	db := ms.db
+	var exists bool
+
+	query := fmt.Sprintf("SELECT EXISTS(SELECT 1 FROM %s WHERE %s)", tableName, whereClause)
+
+	err := db.QueryRow(query, args...).Scan(&exists)
+	if err != nil {
+		return false, fmt.Errorf("DataExists: %v", err)
+	}
+
+	return exists, nil
+}
+
+func (ms *MySQLStorage) ValidateLogin(login string, password string, tableName string) (bool, error) {
+	db := ms.db
+	var exists bool
+
+	query := fmt.Sprintf("SELECT EXISTS(SELECT 1 FROM %s WHERE login = ? AND password = ?)", tableName)
+
+	err := db.QueryRow(query, login, password).Scan(&exists)
+	if err != nil {
+		return false, fmt.Errorf("ValidateLogin: %v", err)
+	}
+
+	return exists, nil
 }
