@@ -13,10 +13,16 @@
     width: 100%;
     padding: 0 20px;
   }
-  
+  .title_img {
+    width: 20px;
+    height: 20px;
+  }
+  .div_img_header {
+    margin-block: 20px;
+  }
   .header-title {
-    font-size: 24px;
-    margin: 0;
+    margin-inline: 643px;
+    width: 65px;
   }
   
   .header-nav {
@@ -34,12 +40,15 @@
   }
   
   .header-nav li {
-    margin: 0 10px;
+    margin-block: 20px ;
+    margin-right: 44px;
+    
   }
   
   .header-nav a {
     text-decoration: none;
-    color: #333;
+    color: #726E8D;
+    font-family: satoshi;
   }
   
   .header-nav a:hover {

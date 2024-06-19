@@ -1,12 +1,13 @@
 // components/MainPage.js
 import React from 'react';
+import "./MainPage.scss"
 import { Link } from 'react-router-dom';
+
 
 const MainPage = () => {
   return (
-    <div>
-      <h1>Main Page</h1>
-      <Link to="/chair">Chair</Link>
+    <div className='mainpage'>
+      <a className='collection' Link to = "/collection">Viev collection</a>
     </div>
   );
 };
