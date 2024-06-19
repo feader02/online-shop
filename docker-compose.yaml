@@ -1,7 +1,5 @@
 services:
   server:
-    networks:
-      - avion_bridge
     container_name: avion
     build:
       context: .
@@ -19,8 +17,6 @@ services:
       - "$PORT:$PORT"
 
   db:
-    networks:
-      - avion_bridge
     image: mysql:8.3
     container_name: avion_db
     restart: unless-stopped
@@ -41,7 +37,3 @@ services:
 
 volumes:
   db_data:
-
-networks:
-  avion_bridge:
-    external: true
