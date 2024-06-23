@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/feader02/online-shop/internal/entities"
+	"github.com/feader02/online-shop/internal/utils"
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func (a *App) GetProductsList(w http.ResponseWriter, r *http.Request) {
@@ -89,6 +91,48 @@ func (a *App) SignIn(w http.ResponseWriter, r *http.Request) {
 		sendError(w, http.StatusUnauthorized, "Invalid username or password")
 		return
 	}
+
+	token, err := utils.CreateJWT(username)
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, "Error generating token")
+		return
+	}
+
+	// Установка куки с JWT токеном
+	http.SetCookie(w, &http.Cookie{
+		Name:    "IsSignIn",
+		Value:   token,
+		Expires: time.Now().Add(time.Hour * 168), // 168 hours = 1 week
+		Path:    "/",
+	})
+
+	sendOk(w)
+}
+
+func (a *App) SignOut(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("IsSignIn")
+	if err != nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	tokenStr := cookie.Value
+	token, err := utils.ValidateJWT(tokenStr)
+	if err != nil || !token.Valid {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "IsSignIn",
+		Value:    "",
+		Expires:  time.Unix(0, 0),
+		MaxAge:   -1,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+		Secure:   false,
+		Path:     "/",
+	})
 
 	sendOk(w)
 }

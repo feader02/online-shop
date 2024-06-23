@@ -3,21 +3,30 @@ package api
 import (
 	"fmt"
 	"github.com/feader02/online-shop/internal/entities"
+	"github.com/feader02/online-shop/internal/utils"
 	"strconv"
 	"strings"
 )
 
 func (a *App) GetProducts(pageNum int, pageSize int, search string, prType string, priceRadius string) ([]entities.Product, error) {
 	var products []entities.Product
-	queryArgs := []interface{}{}
+	queryArgs := make([]interface{}, 0)
 
 	offset := (pageNum - 1) * pageSize
 	offsetSQL := fmt.Sprintf(" LIMIT %d OFFSET %d", pageSize, offset)
 
 	searchSQL := ""
 	if search != "" {
-		searchSQL = "WHERE (name LIKE ? OR description LIKE ?)"
-		queryArgs = append(queryArgs, "%"+search+"%", "%"+search+"%")
+		trigrams := utils.CreateTrigrams(search)
+		searchSQL = "WHERE ("
+		for i, trigram := range trigrams {
+			if i > 0 {
+				searchSQL += " OR "
+			}
+			searchSQL += "(name LIKE ? OR description LIKE ?)"
+			queryArgs = append(queryArgs, "%"+trigram+"%", "%"+trigram+"%")
+		}
+		searchSQL += ")"
 	}
 
 	typeSQL := ""

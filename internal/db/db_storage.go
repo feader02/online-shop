@@ -52,10 +52,6 @@ func NewStorage() *MySQLStorage {
 	}
 
 	s.db = DBConnect(dbConf)
-	err := setUpToDateDB(s.db)
-	if err != nil {
-		fmt.Println(err)
-	}
 
 	fmt.Println(dbConf.FormatDSN())
 

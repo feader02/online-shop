@@ -1,22 +1,12 @@
 package utils
 
-import (
-	"github.com/golang-jwt/jwt/v5"
-	"os"
-	"time"
-)
-
-func GenerateJWT(username string) (string, error) {
-	myAppKey, _ := os.LookupEnv("MY_APP_KEY")
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"username": username,
-		"exp":      time.Now().Add(time.Hour * 72).Unix(),
-	})
-
-	tokenString, err := token.SignedString([]byte(myAppKey))
-	if err != nil {
-		return "", err
+func CreateTrigrams(s string) []string {
+	var trigrams []string
+	for i := 0; i < len(s)-2; i++ {
+		trigrams = append(trigrams, s[i:i+3])
 	}
-
-	return tokenString, nil
+	if len(s) < 3 {
+		trigrams = append(trigrams, s)
+	}
+	return trigrams
 }

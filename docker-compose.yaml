@@ -11,10 +11,10 @@ services:
         condition: service_healthy
     hostname: avion
     env_file:
-      - path: ./.env
-        required: true
+      - ./.env
     ports:
-      - "$PORT:$PORT"
+      - "${PORT}:${PORT}"
+    command: bash -c "migrate -path=/migrations -database \"mysql://$DB_USER:$DB_PASSWORD@tcp($DB_HOST:$DB_PORT)/$DB_NAME\" up && ./avion_server"
 
   db:
     image: mysql:8.3
@@ -25,12 +25,11 @@ services:
       - ./init:/docker-entrypoint-initdb.d
       - db_data:/var/lib/mysql
     ports:
-      - "$MYSQL_TCP_PORT_EXPOSE:$DB_PORT"
+      - "${MYSQL_TCP_PORT_EXPOSE}:${DB_PORT}"
     env_file:
-      - path: ./.env
-        required: true
+      - ./.env
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "$DB_HOST", "-u$DB_USER", "-p$DB_PASSWORD"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "${DB_HOST}", "-u${DB_USER}", "-p${DB_PASSWORD}"]
       interval: 20s
       timeout: 5s
       retries: 20
