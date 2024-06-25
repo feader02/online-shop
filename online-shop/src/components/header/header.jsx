@@ -2,16 +2,25 @@
 import React from 'react';
 import './header.scss';
 import { Link } from 'react-router-dom';
+import avion from "./images/avion.png"
+import search from "./images/search.png"
+import line from "./images/line.png"
+import user from "./images/User.png"
+import cart from "./images/cart.png"
+
+
+
 
 const Header = () => {
   return (
     <header className="header">
-      <div className="header-icons">
-        <div className="icon black-square"></div>
-        <div className="icon black-square"></div>
-        <div className="icon black-square"></div>
+      <div className='div_img_header'>
+      <img className='title_img' src={search} alt="search" />
+      <img src={avion} alt='Avion' className="header-title" />
+      <img className='title_img' src={cart} alt="cart" />
+      <img className='title_img' src={user} alt="user" />
       </div>
-      <h1 className="header-title">Avion</h1>
+      <img className='line_img' src={line} alt="" />
       
       <nav className="header-nav">
         <ul>
