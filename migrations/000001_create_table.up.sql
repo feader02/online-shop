@@ -6,5 +6,6 @@ CREATE TABLE IF NOT EXISTS Product (
                            height INT,
                            width INT,
                            depth INT,
-                           photo VARCHAR(255)
+                           photo VARCHAR(255),
+                           type TEXT
 );

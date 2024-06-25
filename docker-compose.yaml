@@ -28,6 +28,8 @@ services:
       - "${MYSQL_TCP_PORT_EXPOSE}:${DB_PORT}"
     env_file:
       - ./.env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "${DB_HOST}", "-u${DB_USER}", "-p${DB_PASSWORD}"]
       interval: 20s
