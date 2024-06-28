@@ -51,7 +51,10 @@ func (a *App) GetProduct(w http.ResponseWriter, r *http.Request) {
 
 	for _, product := range products {
 		sendResponse(w, product)
+		return
 	}
+
+	sendError(w, http.StatusNotFound, "Product not found")
 }
 
 func (a *App) Registration(w http.ResponseWriter, r *http.Request) {
@@ -98,7 +101,6 @@ func (a *App) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Установка куки с JWT токеном
 	http.SetCookie(w, &http.Cookie{
 		Name:    "IsSignIn",
 		Value:   token,
@@ -139,7 +141,7 @@ func (a *App) SignOut(w http.ResponseWriter, r *http.Request) {
 
 func sendError(w http.ResponseWriter, status int, text string) {
 	w.WriteHeader(status)
-	w.Write([]byte(fmt.Sprintf(`{"status":"error","message":%s"}`, text)))
+	w.Write([]byte(fmt.Sprintf(`{"status":"error","message": "%s"}`, text)))
 }
 
 func sendOk(w http.ResponseWriter) {
